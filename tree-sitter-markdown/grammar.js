@@ -371,7 +371,7 @@ module.exports = grammar({
             )),
             repeat1($._block),
             common.EXTENSION_TASK_LIST ? prec(1, seq(
-                choice($.task_list_marker_checked, $.task_list_marker_unchecked),
+                choice($.task_list_marker_checked, $.task_list_marker_unchecked, $.task_list_marker_urgent, $.task_list_marker_uncertain, $.task_list_marker_canceled),
                 $._whitespace,
                 $.paragraph,
                 repeat($._block)
@@ -395,6 +395,9 @@ module.exports = grammar({
             common.EXTENSION_TASK_LIST ? choice(
                 /\[[xX]\]/,
                 /\[[ \t]\]/,
+                /\[[!]\]/,
+                /\[[?]\]/,
+                /\[[~]\]/,
             ) : choice()
         ),
         // The external scanner emits some characters that should just be ignored.
@@ -403,6 +406,9 @@ module.exports = grammar({
         ...(common.EXTENSION_TASK_LIST ? {
             task_list_marker_checked: $ => prec(1, /\[[xX]\]/),
             task_list_marker_unchecked: $ => prec(1, /\[[ \t]\]/),
+            task_list_marker_urgent: $ => prec(1, /\[[!]\]/),
+            task_list_marker_uncertain: $ => prec(1, /\[[?]\]/),
+            task_list_marker_canceled: $ => prec(1, /\[[~]\]/),
         } : {}),
 
         ...(common.EXTENSION_PIPE_TABLE ? {
